@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dress Up & Speak! 🌞❄️</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sun: #FFB800;
+    --sky: #4FC3F7;
+    --snow: #E3F2FD;
+    --ice: #90CAF9;
+    --grass: #66BB6A;
+    --sand: #FFD54F;
+    --warm: #FF7043;
+    --cold: #42A5F5;
+    --text-dark: #2D2D44;
+    --white: #FFFFFF;
+    --card-bg: rgba(255,255,255,0.92);
+    --shadow: 0 8px 32px rgba(0,0,0,0.15);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* ===== WORLD BACKGROUNDS ===== */
+  .world {
+    min-height: 100vh;
+    transition: background 0.8s ease;
+    position: relative;
+  }
+
+  .world.summer {
+    background: linear-gradient(180deg, #87CEEB 0%, #B0E2FF 40%, #90EE90 60%, #7DBF7D 100%);
+  }
+
+  .world.winter {
+    background: linear-gradient(180deg, #2C3E6B 0%, #4A6FA5 35%, #8FAFD4 55%, #C8DFF7 70%, #E8F4FD 85%, #F0F8FF 100%);
+  }
+
+  /* Floating elements */
+  .floaties {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  .floaty {
+    position: absolute;
+    font-size: 2rem;
+    animation: float linear infinite;
+    opacity: 0.6;
+  }
+
+  @keyframes float {
+    0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.6; }
+    90% { opacity: 0.6; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* ===== MAIN LAYOUT ===== */
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  /* ===== HEADER ===== */
+  header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    animation: bounceIn 0.7s ease;
+  }
+
+  .game-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 2.8rem;
+    color: var(--white);
+    text-shadow: 0 4px 0 rgba(0,0,0,0.2), 0 0 30px rgba(255,255,255,0.4);
+    letter-spacing: 1px;
+    line-height: 1;
+    margin-bottom: 0.3rem;
+  }
+
+  .game-subtitle {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.9);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  /* ===== SCORE BAR ===== */
+  .score-bar {
+    display: flex;
+    justify-content: center;
+    gap: 1.2rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    animation: slideDown 0.5s 0.2s ease both;
+  }
+
+  .score-chip {
+    background: rgba(255,255,255,0.9);
+    border-radius: 50px;
+    padding: 0.5rem 1.3rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    font-size: 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  /* ===== SEASON TOGGLE ===== */
+  .season-toggle {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    animation: slideDown 0.5s 0.3s ease both;
+  }
+
+  .season-btn {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.1rem;
+    padding: 0.7rem 1.8rem;
+    border: 3px solid rgba(255,255,255,0.6);
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: rgba(255,255,255,0.3);
+    color: white;
+    backdrop-filter: blur(4px);
+  }
+
+  .season-btn.active {
+    background: white;
+    color: var(--text-dark);
+    border-color: white;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    transform: scale(1.05);
+  }
+
+  /* ===== GAME CARD ===== */
+  .game-card {
+    background: var(--card-bg);
+    border-radius: 28px;
+    padding: 1.8rem;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(10px);
+    animation: slideUp 0.5s 0.1s ease both;
+    border: 3px solid rgba(255,255,255,0.8);
+  }
+
+  /* ===== MODES NAV ===== */
+  .modes-nav {
+    display: flex;
+    gap: 0.7rem;
+    margin-bottom: 1.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .mode-tab {
+    font-family: 'Fredoka One', cursive;
+    font-size: 0.95rem;
+    padding: 0.5rem 1.2rem;
+    border: 2px solid #ddd;
+    border-radius: 50px;
+    cursor: pointer;
+    background: white;
+    color: #888;
+    transition: all 0.25s;
+  }
+
+  .mode-tab.active { background: #FF7043; color: white; border-color: #FF7043; transform: scale(1.05); }
+  .world.winter .mode-tab.active { background: #42A5F5; border-color: #42A5F5; }
+
+  /* ===== PROGRESS ===== */
+  .progress-wrap { margin-bottom: 1.2rem; }
+  .progress-track {
+    background: #E0E0E0;
+    border-radius: 50px;
+    height: 12px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 50px;
+    background: linear-gradient(90deg, #FF7043, #FFB800);
+    transition: width 0.5s cubic-bezier(.4,0,.2,1);
+  }
+  .world.winter .progress-fill { background: linear-gradient(90deg, #42A5F5, #90CAF9); }
+  .progress-label { font-size: 0.8rem; color: #999; margin-top: 0.3rem; text-align: right; font-weight: 700; }
+
+  /* ===== SCENE DISPLAY ===== */
+  .scene-box {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    background: linear-gradient(135deg, #FFF9C4, #FFEFD5);
+    border-radius: 20px;
+    margin-bottom: 1.5rem;
+    border: 2px dashed #FFD54F;
+    position: relative;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .world.winter .scene-box {
+    background: linear-gradient(135deg, #E3F2FD, #EDE7F6);
+    border-color: #90CAF9;
+  }
+
+  .character-display {
+    font-size: 5rem;
+    display: block;
+    animation: bounce 2s ease infinite;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .clothing-display {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    display: block;
+    animation: pulse 1.5s ease infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+
+  .scene-weather {
+    font-size: 1.8rem;
+    position: absolute;
+    top: 0.8rem;
+    right: 1rem;
+    animation: spin 8s linear infinite;
+  }
+
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+  /* ===== SENTENCE BUILDER ===== */
+  .sentence-area {
+    background: #F8F8FF;
+    border-radius: 16px;
+    padding: 1.2rem;
+    margin-bottom: 1.2rem;
+    border: 2px solid #E8E8FF;
+  }
+
+  .sentence-instruction {
+    font-size: 0.85rem;
+    color: #888;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.8rem;
+  }
+
+  .sentence-display {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.5rem;
+    color: var(--text-dark);
+    min-height: 2.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    align-items: center;
+  }
+
+  .word-slot {
+    background: white;
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    padding: 0.3rem 0.8rem;
+    min-width: 60px;
+    text-align: center;
+    color: #bbb;
+    transition: all 0.2s;
+    font-size: 1.2rem;
+  }
+
+  .word-slot.filled {
+    border-style: solid;
+    border-color: #FF7043;
+    color: var(--text-dark);
+    background: #FFF3F0;
+  }
+
+  .world.winter .word-slot.filled { border-color: #42A5F5; background: #EFF8FF; }
+
+  .word-fixed {
+    color: var(--text-dark);
+    font-size: 1.3rem;
+  }
+
+  /* ===== WORD BANK ===== */
+  .word-bank {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 1.2rem;
+    min-height: 50px;
+    align-content: flex-start;
+  }
+
+  .word-chip {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    background: white;
+    border: 2px solid #FFD54F;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 3px 0 #FFB800;
+    color: var(--text-dark);
+    user-select: none;
+  }
+
+  .word-chip:hover { transform: translateY(-2px); box-shadow: 0 5px 0 #FFB800; }
+  .word-chip:active { transform: translateY(1px); box-shadow: 0 2px 0 #FFB800; }
+  .word-chip.used { opacity: 0.35; cursor: default; transform: none; box-shadow: none; }
+
+  .world.winter .word-chip { border-color: #90CAF9; box-shadow: 0 3px 0 #42A5F5; }
+  .world.winter .word-chip:hover { box-shadow: 0 5px 0 #42A5F5; }
+  .world.winter .word-chip:active { box-shadow: 0 2px 0 #42A5F5; }
+
+  /* ===== BUTTONS ===== */
+  .btn-row { display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap; }
+
+  .btn-check {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.2rem;
+    padding: 0.8rem 2.2rem;
+    background: linear-gradient(135deg, #FF7043, #FF5722);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #BF360C;
+    transition: all 0.2s;
+  }
+
+  .btn-check:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #BF360C; }
+  .btn-check:active { transform: translateY(2px); box-shadow: 0 3px 0 #BF360C; }
+
+  .world.winter .btn-check { background: linear-gradient(135deg, #42A5F5, #1E88E5); box-shadow: 0 5px 0 #1565C0; }
+  .world.winter .btn-check:hover { box-shadow: 0 7px 0 #1565C0; }
+
+  .btn-clear {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.1rem;
+    padding: 0.8rem 1.5rem;
+    background: white;
+    color: #999;
+    border: 2px solid #ddd;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-clear:hover { border-color: #FF7043; color: #FF7043; }
+  .btn-next {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.2rem;
+    padding: 0.8rem 2.2rem;
+    background: linear-gradient(135deg, #66BB6A, #43A047);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #2E7D32;
+    transition: all 0.2s;
+    display: none;
+  }
+
+  .btn-next:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #2E7D32; }
+  .btn-next.show { display: inline-block; animation: popIn 0.3s ease; }
+
+  /* ===== FEEDBACK ===== */
+  .feedback-box {
+    text-align: center;
+    padding: 1rem;
+    border-radius: 16px;
+    margin-top: 1rem;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.3rem;
+    display: none;
+    animation: popIn 0.3s ease;
+  }
+
+  .feedback-box.show { display: block; }
+  .feedback-box.correct { background: #E8F5E9; color: #2E7D32; border: 2px solid #A5D6A7; }
+  .feedback-box.wrong { background: #FFEBEE; color: #C62828; border: 2px solid #FFCDD2; }
+
+  /* ===== MATCH MODE ===== */
+  .match-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .match-col { display: flex; flex-direction: column; gap: 0.7rem; }
+  .col-label { font-family: 'Fredoka One', cursive; font-size: 1rem; text-align: center; margin-bottom: 0.3rem; color: #888; }
+
+  .match-item {
+    padding: 0.8rem 1rem;
+    border-radius: 14px;
+    border: 2px solid #ddd;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 700;
+    background: white;
+    color: var(--text-dark);
+    position: relative;
+  }
+
+  .match-item:hover { border-color: #FF7043; transform: scale(1.02); }
+  .match-item.selected { border-color: #FF7043; background: #FFF3F0; transform: scale(1.02); box-shadow: 0 4px 12px rgba(255,112,67,0.3); }
+  .match-item.matched { border-color: #66BB6A; background: #E8F5E9; cursor: default; }
+  .match-item.wrong-match { border-color: #EF5350; background: #FFEBEE; animation: shake 0.4s ease; }
+  .world.winter .match-item:hover, .world.winter .match-item.selected { border-color: #42A5F5; background: #EFF8FF; }
+  .world.winter .match-item.selected { box-shadow: 0 4px 12px rgba(66,165,245,0.3); }
+
+  .match-emoji { font-size: 1.6rem; display: block; }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+
+  /* ===== QUIZ MODE ===== */
+  .quiz-question {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.4rem;
+    color: var(--text-dark);
+    text-align: center;
+    margin-bottom: 1.2rem;
+    line-height: 1.3;
+  }
+
+  .quiz-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .quiz-opt {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.05rem;
+    padding: 0.9rem;
+    border: 3px solid #E0E0E0;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: white;
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .quiz-opt:hover:not(:disabled) { border-color: #FF7043; transform: scale(1.02); }
+  .quiz-opt.correct { border-color: #66BB6A; background: #E8F5E9; color: #2E7D32; }
+  .quiz-opt.wrong { border-color: #EF5350; background: #FFEBEE; color: #C62828; }
+  .quiz-opt-emoji { font-size: 1.5rem; }
+  .world.winter .quiz-opt:hover:not(:disabled) { border-color: #42A5F5; }
+
+  /* ===== RESULTS ===== */
+  .results {
+    text-align: center;
+    padding: 1.5rem;
+  }
+
+  .results-emoji { font-size: 5rem; display: block; animation: popIn 0.5s ease; margin-bottom: 0.5rem; }
+  .results-score {
+    font-family: 'Fredoka One', cursive;
+    font-size: 3.5rem;
+    color: #FF7043;
+    animation: popIn 0.5s 0.1s ease both;
+  }
+  .world.winter .results-score { color: #42A5F5; }
+  .results-msg {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.5rem;
+    margin: 0.5rem 0 1.5rem;
+    color: var(--text-dark);
+    animation: slideUp 0.5s 0.2s ease both;
+  }
+
+  .stars {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    animation: popIn 0.5s 0.3s ease both;
+  }
+
+  .play-again {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.3rem;
+    padding: 1rem 2.5rem;
+    background: linear-gradient(135deg, #FF7043, #FF5722);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 6px 0 #BF360C;
+    transition: all 0.2s;
+    animation: popIn 0.5s 0.4s ease both;
+  }
+
+  .play-again:hover { transform: translateY(-3px); box-shadow: 0 9px 0 #BF360C; }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    60% { transform: scale(1.1); }
+    80% { transform: scale(0.95); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  @keyframes popIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    70% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  @keyframes slideDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  @keyframes celebrate {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(-10deg) scale(1.2); }
+    75% { transform: rotate(10deg) scale(1.2); }
+  }
+
+  .celebrate { animation: celebrate 0.5s ease 3; }
+
+  /* Confetti particle */
+  .confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 9999;
+    animation: confettiFall linear forwards;
+  }
+
+  @keyframes confettiFall {
+    0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  @media (max-width: 500px) {
+    .game-title { font-size: 2rem; }
+    .quiz-options { grid-template-columns: 1fr; }
+    .match-grid { grid-template-columns: 1fr 1fr; }
+    .game-card { padding: 1.2rem; }
+    .character-display { font-size: 3.5rem; }
+  }
+  /* ===== TEACHER BADGE ===== */
+  .teacher-badge {
+    position: fixed;
+    bottom: 1.2rem;
+    right: 1.2rem;
+    background: rgba(255,255,255,0.95);
+    border-radius: 50px;
+    padding: 0.5rem 1.1rem 0.5rem 0.7rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.15);
+    border: 2px solid rgba(255,255,255,0.8);
+    z-index: 999;
+    backdrop-filter: blur(8px);
+    font-family: 'Fredoka One', cursive;
+    font-size: 0.95rem;
+    color: #2D2D44;
+    animation: slideUp 0.6s 0.5s ease both;
+  }
+
+  .teacher-avatar {
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+
+  .teacher-info {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+  }
+
+  .teacher-label {
+    font-size: 0.65rem;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+  }
+
+  .teacher-name {
+    font-size: 1rem;
+    color: #FF7043;
+  }
+</style>
+
+<!-- Teacher badge -->
+<style>
+  .teacher-badge {
+    position: fixed;
+    bottom: 1.2rem;
+    right: 1.2rem;
+    background: rgba(255,255,255,0.95);
+    border-radius: 50px;
+    padding: 0.5rem 1.1rem 0.5rem 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+    font-family: 'Fredoka One', cursive;
+    font-size: 0.95rem;
+    color: #2D2D44;
+    z-index: 999;
+    border: 2px solid rgba(255,255,255,0.8);
+    backdrop-filter: blur(6px);
+    animation: slideInRight 0.6s 0.5s cubic-bezier(.4,0,.2,1) both;
+  }
+  .teacher-badge .t-icon {
+    font-size: 1.4rem;
+    line-height: 1;
+  }
+  .teacher-badge .t-label {
+    font-size: 0.7rem;
+    color: #FF7043;
+    display: block;
+    line-height: 1;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .teacher-badge .t-name {
+    font-size: 1rem;
+    color: #2D2D44;
+    display: block;
+    line-height: 1.2;
+  }
+  @keyframes slideInRight {
+    from { transform: translateX(120%); opacity: 0; }
+    to   { transform: translateX(0);   opacity: 1; }
+  }
+</style>
+</head>
+<body>
+<div class="world summer" id="world">
+
+  <!-- Floating background elements -->
+  <div class="floaties" id="floaties"></div>
+
+  <div class="app">
+    <!-- Header -->
+    <header>
+      <div class="game-title" id="main-title">👗 Dress Up & Speak! 🧤</div>
+      <div class="game-subtitle" id="main-sub">Learn clothes with Present Continuous!</div>
+    </header>
+
+    <!-- Score Bar -->
+    <div class="score-bar">
+      <div class="score-chip">⭐ <span id="score">0</span> pts</div>
+      <div class="score-chip">✅ <span id="correct-count">0</span> correct</div>
+      <div class="score-chip">🔥 <span id="streak">0</span> streak</div>
+    </div>
+
+    <!-- Season Toggle -->
+    <div class="season-toggle">
+      <button class="season-btn active" id="btn-summer" onclick="setSeason('summer')">☀️ Summer</button>
+      <button class="season-btn" id="btn-winter" onclick="setSeason('winter')">❄️ Winter</button>
+    </div>
+
+    <!-- Game Card -->
+    <div class="game-card">
+
+      <!-- Mode Tabs -->
+      <div class="modes-nav">
+        <button class="mode-tab active" id="tab-build" onclick="setMode('build')">🔤 Build a Sentence</button>
+        <button class="mode-tab" id="tab-quiz" onclick="setMode('quiz')">❓ Quiz Time</button>
+        <button class="mode-tab" id="tab-match" onclick="setMode('match')">🔗 Match It!</button>
+      </div>
+
+      <!-- Progress -->
+      <div class="progress-wrap">
+        <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+        <div class="progress-label" id="progress-label">Question 1 of 8</div>
+      </div>
+
+      <!-- Game Content -->
+      <div id="game-content"></div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ===== DATA =====
+const clothes = {
+  summer: [
+    { name: "sunglasses", emoji: "🕶️", article: "a pair of", verb: "wearing" },
+    { name: "T-shirt",    emoji: "👕", article: "a", verb: "wearing" },
+    { name: "shorts",     emoji: "🩳", article: "a pair of", verb: "wearing" },
+    { name: "sandals",    emoji: "👡", article: "a pair of", verb: "wearing" },
+    { name: "swimsuit",   emoji: "🩱", article: "a", verb: "wearing" },
+    { name: "sun hat",    emoji: "👒", article: "a", verb: "wearing" },
+    { name: "flip-flops", emoji: "🩴", article: "a pair of", verb: "wearing" },
+    { name: "dress",      emoji: "👗", article: "a", verb: "wearing" },
+  ],
+  winter: [
+    { name: "coat",      emoji: "🧥", article: "a", verb: "wearing" },
+    { name: "scarf",     emoji: "🧣", article: "a", verb: "wearing" },
+    { name: "gloves",    emoji: "🧤", article: "a pair of", verb: "wearing" },
+    { name: "boots",     emoji: "👢", article: "a pair of", verb: "wearing" },
+    { name: "hat",       emoji: "🎩", article: "a", verb: "wearing" },
+    { name: "sweater",   emoji: "🧶", article: "a", verb: "wearing" },
+    { name: "earmuffs",  emoji: "🎧", article: "a pair of", verb: "wearing" },
+    { name: "mittens",   emoji: "🥊", article: "a pair of", verb: "wearing" },
+  ]
+};
+
+const subjects = [
+  { name: "She",  emoji: "👧", aux: "is" },
+  { name: "He",   emoji: "👦", aux: "is" },
+  { name: "They", emoji: "👨‍👩‍👧", aux: "are" },
+  { name: "I",    emoji: "🧒", aux: "am" },
+];
+
+const summerFloats = ["☀️","🌻","🏖️","🌴","🍹","🦋","🌸","🌊","🐚","⛱️"];
+const winterFloats = ["❄️","⛄","🌨️","🏔️","🦌","🎿","🌟","✨","🧊"];
+
+// ===== STATE =====
+let season = 'summer';
+let mode = 'build';
+let questionIndex = 0;
+let totalQuestions = 8;
+let score = 0;
+let correctCount = 0;
+let streak = 0;
+let currentQ = null;
+let matchState = { selected: null, matched: [], pairs: [] };
+let buildSlots = [];
+let buildAnswerWords = [];
+
+// ===== INIT =====
+function init() {
+  createFloaties();
+  renderGame();
+}
+
+function createFloaties() {
+  const container = document.getElementById('floaties');
+  container.innerHTML = '';
+  const items = season === 'summer' ? summerFloats : winterFloats;
+  for (let i = 0; i < 14; i++) {
+    const f = document.createElement('div');
+    f.className = 'floaty';
+    f.textContent = items[Math.floor(Math.random() * items.length)];
+    f.style.left = Math.random() * 100 + 'vw';
+    f.style.fontSize = (1.2 + Math.random() * 1.5) + 'rem';
+    f.style.animationDuration = (8 + Math.random() * 12) + 's';
+    f.style.animationDelay = (Math.random() * 10) + 's';
+    container.appendChild(f);
+  }
+}
+
+function setSeason(s) {
+  season = s;
+  questionIndex = 0;
+  document.getElementById('world').className = 'world ' + s;
+  document.getElementById('btn-summer').classList.toggle('active', s === 'summer');
+  document.getElementById('btn-winter').classList.toggle('active', s === 'winter');
+
+  const titleEl = document.getElementById('main-title');
+  const subEl = document.getElementById('main-sub');
+  if (s === 'summer') {
+    titleEl.textContent = '👗 Dress Up & Speak! 🕶️';
+    subEl.textContent = '☀️ Summer Clothes with Present Continuous!';
+  } else {
+    titleEl.textContent = '🧥 Dress Up & Speak! 🧤';
+    subEl.textContent = '❄️ Winter Clothes with Present Continuous!';
+  }
+  createFloaties();
+  renderGame();
+}
+
+function setMode(m) {
+  mode = m;
+  questionIndex = 0;
+  ['build','quiz','match'].forEach(x => {
+    document.getElementById('tab-' + x).classList.toggle('active', x === m);
+  });
+  renderGame();
+}
+
+function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+
+function updateProgress() {
+  const pct = (questionIndex / totalQuestions) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = `Question ${Math.min(questionIndex + 1, totalQuestions)} of ${totalQuestions}`;
+}
+
+function updateScore() {
+  document.getElementById('score').textContent = score;
+  document.getElementById('correct-count').textContent = correctCount;
+  document.getElementById('streak').textContent = streak;
+}
+
+// ===== RENDER GAME =====
+function renderGame() {
+  updateProgress();
+  if (questionIndex >= totalQuestions) { showResults(); return; }
+
+  if (mode === 'build') renderBuildMode();
+  else if (mode === 'quiz') renderQuizMode();
+  else if (mode === 'match') renderMatchMode();
+}
+
+// ===== BUILD A SENTENCE MODE =====
+function renderBuildMode() {
+  const items = clothes[season];
+  const item = items[questionIndex % items.length];
+  const subject = subjects[questionIndex % subjects.length];
+  currentQ = { item, subject };
+
+  // Answer: She is wearing a T-shirt.
+  const correctWords = [subject.name, subject.aux, "wearing", item.article, item.name + "."];
+
+  // Word bank: correct + distractors
+  const allWords = [subject.name, subject.aux, "wearing", item.article, item.name + "."];
+  const distractors = shuffle(["running", "eating", "playing", "has", "have", "the", "an", "a pair of"]).slice(0, 3);
+  const bankWords = shuffle([...allWords, ...distractors]);
+
+  buildAnswerWords = correctWords;
+  buildSlots = Array(correctWords.length).fill(null);
+
+  const gc = document.getElementById('game-content');
+  gc.innerHTML = `
+    <div class="scene-box">
+      <div class="scene-weather">${season === 'summer' ? '☀️' : '❄️'}</div>
+      <span class="character-display">${subject.emoji}</span>
+      <span class="clothing-display">${item.emoji}</span>
+      <div style="font-family:'Fredoka One',cursive;font-size:1rem;color:#999;margin-top:0.3rem">
+        ${subject.name} and the ${item.name}
+      </div>
+    </div>
+
+    <div class="sentence-area">
+      <div class="sentence-instruction">🏗️ Build the sentence! Tap the words in order:</div>
+      <div class="sentence-display" id="slot-display">
+        ${buildSlots.map((_,i) => `<div class="word-slot" id="slot-${i}">?</div>`).join('')}
+      </div>
+    </div>
+
+    <div class="word-bank" id="word-bank">
+      ${bankWords.map((w, i) => `<button class="word-chip" id="chip-${i}" onclick="tapWord('${w}', ${i})">${w}</button>`).join('')}
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-clear" onclick="clearSlots()">🔄 Clear</button>
+      <button class="btn-check" onclick="checkBuild()">✅ Check!</button>
+      <button class="btn-next show" id="btn-next" onclick="nextQ()" style="display:none">Next ➡️</button>
+    </div>
+
+    <div class="feedback-box" id="feedback"></div>
+  `;
+}
+
+function tapWord(word, chipIndex) {
+  const chip = document.getElementById('chip-' + chipIndex);
+  if (chip.classList.contains('used')) return;
+
+  // Find first empty slot
+  const emptyIndex = buildSlots.indexOf(null);
+  if (emptyIndex === -1) return;
+
+  buildSlots[emptyIndex] = { word, chipIndex };
+  chip.classList.add('used');
+
+  // Update display
+  buildSlots.forEach((slot, i) => {
+    const el = document.getElementById('slot-' + i);
+    if (slot) {
+      el.textContent = slot.word;
+      el.classList.add('filled');
+    }
+  });
+}
+
+function clearSlots() {
+  buildSlots = Array(buildAnswerWords.length).fill(null);
+  document.querySelectorAll('.word-chip').forEach(c => c.classList.remove('used'));
+  document.querySelectorAll('.word-slot').forEach(s => {
+    s.textContent = '?';
+    s.classList.remove('filled');
+  });
+  document.getElementById('feedback').className = 'feedback-box';
+}
+
+function checkBuild() {
+  if (buildSlots.includes(null)) {
+    showFeedback('wrong', '🤔 Fill in all the words first!');
+    return;
+  }
+
+  const userSentence = buildSlots.map(s => s.word).join(' ');
+  const correctSentence = buildAnswerWords.join(' ');
+  const { item, subject } = currentQ;
+
+  if (userSentence === correctSentence) {
+    correctCount++; streak++; score += 10 + streak * 2;
+    updateScore();
+    showFeedback('correct', `🎉 Amazing! "${subject.name} ${subject.aux} wearing ${item.article} ${item.name}." is correct!`);
+    document.getElementById('btn-next').style.display = 'inline-block';
+    playCorrectSound();
+    confetti();
+  } else {
+    streak = 0; updateScore();
+    showFeedback('wrong', `❌ Almost! The correct sentence is: <br>"${subject.name} ${subject.aux} wearing ${item.article} ${item.name}."`);
+    document.getElementById('btn-next').style.display = 'inline-block';
+    playWrongSound();
+  }
+}
+
+// ===== QUIZ MODE =====
+function renderQuizMode() {
+  const items = clothes[season];
+  const item = items[questionIndex % items.length];
+  const subject = subjects[questionIndex % subjects.length];
+  currentQ = { item, subject };
+
+  // Pick question type
+  const qType = questionIndex % 3;
+  let question, correctAnswer, wrongAnswers, isAuxQ = false;
+
+  if (qType === 0) {
+    // What is she wearing?
+    question = `👀 Look at ${subject.emoji}. What ${subject.aux === 'are' ? 'are' : 'is'} ${subject.name.toLowerCase()} wearing?`;
+    correctAnswer = { text: `${item.emoji} ${item.article} ${item.name}`, value: 'correct' };
+    const wrongs = shuffle(items.filter(i => i.name !== item.name)).slice(0, 3);
+    wrongAnswers = wrongs.map(w => ({ text: `${w.emoji} ${w.article} ${w.name}`, value: 'wrong' }));
+  } else if (qType === 1) {
+    // Choose the correct verb
+    question = `📝 She _______ a ${item.name}. Choose the correct word!`;
+    correctAnswer = { text: "is wearing", value: 'correct' };
+    wrongAnswers = [
+      { text: "wears", value: 'wrong' },
+      { text: "is wear", value: 'wrong' },
+      { text: "are wearing", value: 'wrong' },
+    ];
+    isAuxQ = true;
+  } else {
+    // Complete the sentence
+    const oItems = clothes[season === 'summer' ? 'winter' : 'summer'];
+    const wrongSeason = oItems[Math.floor(Math.random() * oItems.length)];
+    question = `🌡️ It's ${season}! Which sentence is correct?`;
+    correctAnswer = { text: `${subject.emoji} ${subject.name} is wearing ${item.article} ${item.name} ${item.emoji}`, value: 'correct' };
+    wrongAnswers = [
+      { text: `${subject.emoji} ${subject.name} wearing ${item.article} ${item.name} ${item.emoji}`, value: 'wrong' },
+      { text: `${subject.emoji} ${subject.name} is wearing ${wrongSeason.article} ${wrongSeason.name} ${wrongSeason.emoji}`, value: 'wrong' },
+      { text: `${subject.emoji} ${subject.name} are wearing ${item.article} ${item.name} ${item.emoji}`, value: 'wrong' },
+    ];
+  }
+
+  const allOpts = shuffle([correctAnswer, ...wrongAnswers]);
+
+  const gc = document.getElementById('game-content');
+  gc.innerHTML = `
+    <div class="scene-box">
+      <div class="scene-weather">${season === 'summer' ? '☀️' : '❄️'}</div>
+      <span class="character-display">${subject.emoji}</span>
+      <span class="clothing-display">${item.emoji}</span>
+    </div>
+
+    <div class="quiz-question">${question}</div>
+
+    <div class="quiz-options">
+      ${allOpts.map(opt => `
+        <button class="quiz-opt" onclick="checkQuiz(this, '${opt.value}', '${item.emoji} ${item.name}')">
+          <span style="font-size:1.3rem">${opt.text.includes('emoji') ? '' : ''}</span>
+          ${opt.text}
+        </button>
+      `).join('')}
+    </div>
+
+    <div class="feedback-box" id="feedback"></div>
+    <div class="btn-row" style="margin-top:1rem">
+      <button class="btn-next" id="btn-next" onclick="nextQ()">Next ➡️</button>
+    </div>
+  `;
+}
+
+function checkQuiz(btn, value, itemName) {
+  document.querySelectorAll('.quiz-opt').forEach(b => b.disabled = true);
+  if (value === 'correct') {
+    btn.classList.add('correct');
+    correctCount++; streak++; score += 10 + streak * 2;
+    updateScore();
+    showFeedback('correct', `🎉 That's right! You're a superstar! ⭐`);
+    playCorrectSound();
+    confetti();
+  } else {
+    btn.classList.add('wrong');
+    streak = 0; updateScore();
+    // Highlight correct
+    document.querySelectorAll('.quiz-opt').forEach(b => {
+      if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'correct'")) b.classList.add('correct');
+    });
+    showFeedback('wrong', `❌ Not quite! Check the correct answer highlighted in green!`);
+    playWrongSound();
+  }
+  document.getElementById('btn-next').classList.add('show');
+}
+
+// ===== MATCH MODE =====
+function renderMatchMode() {
+  const items = shuffle(clothes[season]).slice(0, 5);
+  const subj = subjects[0];
+
+  // Pairs: emoji <-> sentence
+  matchState = {
+    selected: null,
+    matched: [],
+    leftItems: items.map(item => ({ id: item.name, text: item.emoji + ' ' + item.name, side: 'left' })),
+    rightItems: shuffle(items.map(item => ({ id: item.name, text: `${subj.name} ${subj.aux} wearing ${item.article} ${item.name}.`, side: 'right' }))),
+    total: items.length
+  };
+
+  const gc = document.getElementById('game-content');
+  gc.innerHTML = `
+    <div style="text-align:center;margin-bottom:1rem">
+      <div style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:#555">
+        🔗 Match the clothes to the sentence!
+      </div>
+    </div>
+
+    <div class="match-grid">
+      <div class="match-col">
+        <div class="col-label">👕 Clothes</div>
+        ${matchState.leftItems.map(item => `
+          <div class="match-item" id="L-${item.id}" onclick="matchTap('L', '${item.id}')">
+            <span class="match-emoji">${item.text}</span>
+          </div>
+        `).join('')}
+      </div>
+      <div class="match-col">
+        <div class="col-label">📝 Sentences</div>
+        ${matchState.rightItems.map(item => `
+          <div class="match-item" id="R-${item.id}" onclick="matchTap('R', '${item.id}')">
+            <span style="font-size:0.85rem;font-weight:700;">${item.text}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="feedback-box" id="feedback"></div>
+  `;
+}
+
+function matchTap(side, id) {
+  const el = document.getElementById(side + '-' + id);
+  if (matchState.matched.includes(id)) return;
+  if (el.classList.contains('matched')) return;
+
+  if (!matchState.selected) {
+    // First selection
+    document.querySelectorAll('.match-item').forEach(e => e.classList.remove('selected'));
+    el.classList.add('selected');
+    matchState.selected = { side, id };
+  } else {
+    // Second selection
+    const prev = matchState.selected;
+    if (prev.side === side) {
+      // Same side - switch selection
+      document.querySelectorAll('.match-item').forEach(e => e.classList.remove('selected'));
+      el.classList.add('selected');
+      matchState.selected = { side, id };
+      return;
+    }
+
+    // Different sides - check match
+    const prevEl = document.getElementById(prev.side + '-' + prev.id);
+    if (prev.id === id) {
+      // MATCH!
+      el.classList.remove('selected');
+      el.classList.add('matched');
+      prevEl.classList.remove('selected');
+      prevEl.classList.add('matched');
+      matchState.matched.push(id);
+      matchState.selected = null;
+      correctCount++; streak++; score += 8;
+      updateScore();
+
+      if (matchState.matched.length === matchState.total) {
+        setTimeout(() => {
+          showFeedback('correct', '🎉 Perfect! You matched them all!');
+          playCorrectSound();
+          confetti(); confetti();
+          setTimeout(() => nextQ(), 1800);
+        }, 400);
+      } else {
+        showFeedback('correct', `✅ Match found! Keep going!`);
+        playCorrectSound();
+      }
+    } else {
+      // WRONG
+      el.classList.add('wrong-match');
+      prevEl.classList.add('wrong-match');
+      streak = 0; updateScore();
+      playWrongSound();
+      setTimeout(() => {
+        el.classList.remove('wrong-match', 'selected');
+        prevEl.classList.remove('wrong-match', 'selected');
+        matchState.selected = null;
+        showFeedback('wrong', `❌ Oops! Try again!`);
+      }, 700);
+    }
+  }
+}
+
+// ===== SHARED =====
+function showFeedback(type, msg) {
+  const fb = document.getElementById('feedback');
+  if (!fb) return;
+  fb.className = 'feedback-box show ' + (type === 'correct' ? 'correct' : 'wrong');
+  fb.innerHTML = msg;
+}
+
+function nextQ() {
+  questionIndex++;
+  renderGame();
+}
+
+// ===== RESULTS =====
+function showResults() {
+  const pct = Math.round((correctCount / totalQuestions) * 100);
+  let emoji, msg;
+  if (pct >= 90) { emoji = '🏆'; msg = 'You\'re a Clothes Champion!'; }
+  else if (pct >= 70) { emoji = '🌟'; msg = 'Great job, Super Learner!'; }
+  else if (pct >= 50) { emoji = '👍'; msg = 'Nice work! Keep practicing!'; }
+  else { emoji = '📖'; msg = 'Keep trying! You\'re getting there!'; }
+
+  const stars = pct >= 90 ? '⭐⭐⭐' : pct >= 70 ? '⭐⭐' : '⭐';
+
+  document.getElementById('game-content').innerHTML = `
+    <div class="results">
+      <span class="results-emoji">${emoji}</span>
+      <div class="results-score">${score} Points!</div>
+      <div class="stars">${stars}</div>
+      <div class="results-msg">${msg}</div>
+      <div style="color:#999;margin-bottom:1.5rem;font-size:0.95rem">You got <strong>${correctCount}</strong> correct!</div>
+      <button class="play-again" onclick="playAgain()">🔄 Play Again!</button>
+    </div>
+  `;
+
+  confetti(); confetti(); confetti();
+  playWinSound();
+}
+
+function playAgain() {
+  questionIndex = 0;
+  correctCount = 0;
+  streak = 0;
+  updateScore();
+  renderGame();
+}
+
+// ===== CONFETTI =====
+function confetti() {
+  const colors = ['#FF7043','#FFB800','#66BB6A','#42A5F5','#AB47BC','#EC407A'];
+  for (let i = 0; i < 30; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.top = '-10px';
+    el.style.background = colors[Math.floor(Math.random() * colors.length)];
+    el.style.width = (6 + Math.random() * 8) + 'px';
+    el.style.height = (6 + Math.random() * 8) + 'px';
+    el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    el.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+    el.style.animationDelay = (Math.random() * 0.5) + 's';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3000);
+  }
+}
+
+// ===== SOUND ENGINE (Web Audio API — no external files needed) =====
+let audioCtx = null;
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playCorrectSound() {
+  try {
+    const ctx = getAudioCtx();
+    // Happy ascending chime: C5 → E5 → G5 → C6
+    const notes = [523.25, 659.25, 783.99, 1046.50];
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.13);
+
+      gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.13);
+      gain.gain.linearRampToValueAtTime(0.35, ctx.currentTime + i * 0.13 + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.13 + 0.35);
+
+      osc.start(ctx.currentTime + i * 0.13);
+      osc.stop(ctx.currentTime + i * 0.13 + 0.4);
+    });
+
+    // Add a little sparkle layer
+    const sparkOsc = ctx.createOscillator();
+    const sparkGain = ctx.createGain();
+    sparkOsc.connect(sparkGain);
+    sparkGain.connect(ctx.destination);
+    sparkOsc.type = 'triangle';
+    sparkOsc.frequency.setValueAtTime(1800, ctx.currentTime + 0.38);
+    sparkOsc.frequency.exponentialRampToValueAtTime(2400, ctx.currentTime + 0.55);
+    sparkGain.gain.setValueAtTime(0.18, ctx.currentTime + 0.38);
+    sparkGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.65);
+    sparkOsc.start(ctx.currentTime + 0.38);
+    sparkOsc.stop(ctx.currentTime + 0.7);
+  } catch(e) {}
+}
+
+function playWrongSound() {
+  try {
+    const ctx = getAudioCtx();
+    // Sad descending "womp": Bb4 → G4 → Eb4
+    const notes = [466.16, 392.00, 311.13];
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.18);
+      osc.frequency.linearRampToValueAtTime(freq * 0.92, ctx.currentTime + i * 0.18 + 0.16);
+
+      gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.18);
+      gain.gain.linearRampToValueAtTime(0.22, ctx.currentTime + i * 0.18 + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.18 + 0.28);
+
+      osc.start(ctx.currentTime + i * 0.18);
+      osc.stop(ctx.currentTime + i * 0.18 + 0.32);
+    });
+
+    // Low thud
+    const thud = ctx.createOscillator();
+    const thudGain = ctx.createGain();
+    thud.connect(thudGain);
+    thudGain.connect(ctx.destination);
+    thud.type = 'sine';
+    thud.frequency.setValueAtTime(120, ctx.currentTime);
+    thud.frequency.exponentialRampToValueAtTime(55, ctx.currentTime + 0.25);
+    thudGain.gain.setValueAtTime(0.4, ctx.currentTime);
+    thudGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+    thud.start(ctx.currentTime);
+    thud.stop(ctx.currentTime + 0.35);
+  } catch(e) {}
+}
+
+function playWinSound() {
+  try {
+    const ctx = getAudioCtx();
+    // Victory fanfare: ascending run + held chord
+    const melody = [523.25, 659.25, 783.99, 659.25, 1046.50];
+    melody.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.11);
+      gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.11);
+      gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + i * 0.11 + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.11 + (i === 4 ? 0.8 : 0.22));
+      osc.start(ctx.currentTime + i * 0.11);
+      osc.stop(ctx.currentTime + i * 0.11 + 0.9);
+    });
+  } catch(e) {}
+}
+
+// ===== START =====
+init();
+</script>
+<!-- Teacher badge fixed corner -->
+<div class="teacher-badge">
+  <span class="t-icon">👩‍🏫</span>
+  <div>
+    <span class="t-label">Teacher</span>
+    <span class="t-name">Miss Mara</span>
+  </div>
+</div>
+
+</body>
+</html>
