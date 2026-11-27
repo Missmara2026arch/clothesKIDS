@@ -977,20 +977,25 @@ function renderQuizMode() {
   const qType = questionIndex % 3;
   let question, correctAnswer, wrongAnswers, isAuxQ = false;
 
+  // Correct auxiliary for this subject (I am / She is / He is / They are)
+  const aux = subject.aux;
+  const wrongAuxes = shuffle(['is', 'are', 'am'].filter(a => a !== aux));
+  const subjLower = subject.name === 'I' ? 'I' : subject.name.toLowerCase();
+
   if (qType === 0) {
-    // What is she wearing?
-    question = `👀 Look at ${subject.emoji}. What ${subject.aux === 'are' ? 'are' : 'is'} ${subject.name.toLowerCase()} wearing?`;
+    // What is she wearing? / What are they wearing? / What am I wearing?
+    question = `👀 Look at ${subject.emoji}. What ${aux} ${subjLower} wearing?`;
     correctAnswer = { text: `${item.emoji} ${item.article} ${item.name}`, value: 'correct' };
     const wrongs = shuffle(items.filter(i => i.name !== item.name)).slice(0, 3);
     wrongAnswers = wrongs.map(w => ({ text: `${w.emoji} ${w.article} ${w.name}`, value: 'wrong' }));
   } else if (qType === 1) {
-    // Choose the correct verb
-    question = `📝 She _______ a ${item.name}. Choose the correct word!`;
-    correctAnswer = { text: "is wearing", value: 'correct' };
+    // Choose the correct verb form for THIS subject
+    question = `📝 ${subject.name} _______ ${item.article} ${item.name}. Choose the correct words!`;
+    correctAnswer = { text: `${aux} wearing`, value: 'correct' };
     wrongAnswers = [
-      { text: "wears", value: 'wrong' },
-      { text: "is wear", value: 'wrong' },
-      { text: "are wearing", value: 'wrong' },
+      { text: `wearing`, value: 'wrong' },
+      { text: `${wrongAuxes[0]} wearing`, value: 'wrong' },
+      { text: `${aux} wear`, value: 'wrong' },
     ];
     isAuxQ = true;
   } else {
@@ -998,11 +1003,11 @@ function renderQuizMode() {
     const oItems = clothes[season === 'summer' ? 'winter' : 'summer'];
     const wrongSeason = oItems[Math.floor(Math.random() * oItems.length)];
     question = `🌡️ It's ${season}! Which sentence is correct?`;
-    correctAnswer = { text: `${subject.emoji} ${subject.name} is wearing ${item.article} ${item.name} ${item.emoji}`, value: 'correct' };
+    correctAnswer = { text: `${subject.emoji} ${subject.name} ${aux} wearing ${item.article} ${item.name} ${item.emoji}`, value: 'correct' };
     wrongAnswers = [
       { text: `${subject.emoji} ${subject.name} wearing ${item.article} ${item.name} ${item.emoji}`, value: 'wrong' },
-      { text: `${subject.emoji} ${subject.name} is wearing ${wrongSeason.article} ${wrongSeason.name} ${wrongSeason.emoji}`, value: 'wrong' },
-      { text: `${subject.emoji} ${subject.name} are wearing ${item.article} ${item.name} ${item.emoji}`, value: 'wrong' },
+      { text: `${subject.emoji} ${subject.name} ${aux} wearing ${wrongSeason.article} ${wrongSeason.name} ${wrongSeason.emoji}`, value: 'wrong' },
+      { text: `${subject.emoji} ${subject.name} ${wrongAuxes[0]} wearing ${item.article} ${item.name} ${item.emoji}`, value: 'wrong' },
     ];
   }
 
